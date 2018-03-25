@@ -178,11 +178,11 @@ The trained model is serialized to a file using Pickle.
 \section{Part II. The Production Run}
 
 \subsection{The Code Base}
-We deserialize the model we trained in Part I in Python and apply it to the held-out data.
+We de-serialize the model we trained in Part I in Python and apply it to the held-out data.
 
 The highlights in our production-quality code in Python are
 \begin{itemize}
-  \item object-oriented programming (using classes and member functions).
+  \item object-oriented programming (using classes and member functions).  The library code resides in \texttt{model.py}.
 
   \item Python logging
 % unit testing
@@ -219,8 +219,17 @@ Since we remember the previous data-cleaning operations, we will apply them to t
 \subsection{Prediction of the Holdout Data Set}
 
 
-\section{Discussions}
+We apply the trained model to the holdout data set by calling the driver code.
 
+\begin{verbatim}
+    $ python run_model.py
+\end{verbatim}
+
+The tab-separated output is called \texttt{output.tsv}.  It consists of two columns \texttt{delivery\_id}
+and \texttt{predicted\_delivery\_seconds} and 54,778 records.
+
+\section{Discussions}
+From Part I, since the median value of \texttt{fractional\_busy\_dashers} is 0.95, we suggest that we make more dashers available to reduce the total delivery time.
 
 \end{document}
 
