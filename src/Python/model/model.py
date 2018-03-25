@@ -59,6 +59,7 @@ class Model(object):
         """
         logger = logging.getLogger('Model.load_model()')
 
+        logger.info( 'Loading model from ' + pickle_file_name )
         self.model = pickle.load( open( pickle_file_name, 'rb') )
 
 

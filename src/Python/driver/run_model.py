@@ -46,7 +46,7 @@ def main():
     pd.set_option('display.max_columns', None)
 
     model = Model()
-    model.load_model('../notebooks/rf_simple.1521943419.pkl')
+    model.load_model('../notebooks/rf.1521943419.pkl')
 
     # Load input data.
     str_file_csv = 'data_to_predict.json'
