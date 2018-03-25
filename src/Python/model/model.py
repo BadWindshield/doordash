@@ -86,6 +86,8 @@ class Model(object):
         for col in self.cols_categorical:
             df_csv[col].fillna(df_csv[col].mode()[0], inplace=True)
 
+        df_csv[['store_primary_category']] = df_csv[['store_primary_category']].fillna(value='unknown')
+
         for col in self.cols_cont:
             df_csv[col].fillna(df_csv[col].median(), inplace=True)
 
