@@ -30,11 +30,13 @@
 
 \section{Part I. Model Building}
 
+The work was done in a Jupyter notebook called \texttt{explore\_and\_build\_model.ipynb},
+which is submitted for evaluation.
 
 \subsection{Exploratory Analysis}
 
 
-\subsection{Create Additional Features}
+\subsection{Creating Additional Features}
 
 
 \subsection{Summary of Features used in the Model}
@@ -66,17 +68,58 @@ The continuous features are:
 
 
 \subsection{Removing Outliers}
-% Include the outcome variables
+% Include the outcome variables.
 
-\subsection{Imputating Missing Values}
+We remove the outliers in the features and in the outcome variable and replace the values with NaN, which will be dealt with in the next stage. We consider a data point to be an outlier if the value is outside the 99-percentile of the population. An example is shown below, where the 99-percentile value of the outcome variable (\texttt{outcome\_total\_delivery\_time}) is 6475 seconds. However, there are outcome values that far exceed this number (e.g., \texttt{outcome\_total\_delivery\_time} = 8.52 million seconds!).
 
+
+\begin{verbatim}
+    count    1.974210e+05
+    mean     2.908257e+03
+    std      1.922961e+04
+    min      1.010000e+02
+    1%       1.152000e+03
+    10%      1.699000e+03
+    25%      2.104000e+03
+    50%      2.660000e+03
+    75%      3.381000e+03
+    90%      4.235000e+03
+    95%      4.872000e+03
+    99%      6.474800e+03
+    max      8.516859e+06
+    Name: outcome_total_delivery_time, dtype: float64
+\end{verbatim}
+
+As an second example (Fig.~\ref{fig:total_onshift_dashers}), note that some of the values of \texttt{total\_onshift\_dashers} are negative, which are wrong.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=6in]{graphics/total_onshift_dashers.png}
+\caption{Box plot of the feature \texttt{total\_onshift\_dashers}.}
+\label{fig:total_onshift_dashers}
+\end{figure}
+
+\subsection{Imputating Missing/Null Values}
+
+We replace missing categorical values with the mode, and missing continuous values with the median.
+
+We remember these operations and will repeat them during the production run.
 
 \subsection{Training and Testing the Model}
 % mention rf
+To get the best performance, we model the outcome variable using random-forest regression with 200 trees.
+We plot the observed outcome variable versus the predicted outcome variable, and the residual versus the predicted outcome variable in Fig.~\ref{fig:results01}.  The root-mean-squared error (RMSE) is found to be $900~\text{seconds} \pm 5\%$, which is decent (about 15 minutes).
+
 
 % 2 plots of results
+\begin{figure}[H]
+\centering
+\includegraphics[width=6in]{graphics/results.png}
+\caption{Plot of the observed outcome variable versus the predicted outcome variable, and plot of the residual versus the predicted outcome variable.}
+\label{fig:results01}
+\end{figure}
 
-% RMSE = xx
+
 
 
 
@@ -91,6 +134,9 @@ The continuous features are:
 
 
 \subsection{Cleaning of Model Features}
+
+
+\subsection{Prediction of the Holdout Data Set}
 
 
 \end{document}
