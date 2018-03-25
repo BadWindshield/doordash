@@ -102,7 +102,7 @@ class Model(object):
         logger.info( 'type(df_features) = ' + str(type(df_features)) )
 
         df_featuers_in = df_features.copy()
-        logger.info( 'df_featuers_in =\n' + str(df_featuers_in) )
+        logger.info( 'df_featuers_in.head() =\n' + str(df_featuers_in.head()) )
 
         try:
             # Might not exist.
@@ -141,43 +141,4 @@ class Model(object):
 
         return y_pred
 
-
-def main():
-    # Configure logging.
-    logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(process)d/%(threadName)s - %(name)s - %(levelname)s - %(message)s',
-                        #stream=sys.stdout)
-                        filename='./model.log',
-                        filemode='w')
-    logger = logging.getLogger('main()')
-
-    pd.set_option('display.max_columns', None)
-
-    model = Model()
-    model.load_model('../notebooks/rf_simple.1521943419.pkl')
-
-    # Load input data.
-    str_file_csv = 'historical_data.csv'
-    df_csv = pd.read_csv('../../../data/input/' + str_file_csv,
-                         parse_dates=['created_at',
-                                      'actual_delivery_time'])
-
-    # Try to calculate the outcome variable.
-    col_outcome = 'outcome_total_delivery_time'
-    df_csv[col_outcome] = ( df_csv['actual_delivery_time'] - df_csv['created_at'] ) / np.timedelta64(1, 's')
-    logging.info( 'df_csv.head() =\n' + str(df_csv.head()) )
-
-    # Make a few predictions.
-    df_csv_slice = df_csv.iloc[0:5]
-    y_pred = model.predict( df_csv_slice )
-    logging.info( ' ypred = ' + str(y_pred))
-
-    # Compute RMSE.
-    y_test = df_csv_slice['outcome_total_delivery_time']
-    RMSE = np.sqrt( mean_squared_error(y_test, y_pred) )
-    logger.info( 'RMSE = ' + str(RMSE) )
-
-
-if __name__ == "__main__":
-    main()
 

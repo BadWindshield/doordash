@@ -41,7 +41,7 @@ class TestModel(unittest.TestCase):
         num_rows = 50
         df_csv_slice = self.df_csv.iloc[0:num_rows]
         y_pred = self.model.predict( df_csv_slice )
-        logging.info( ' ypred = ' + str(y_pred))
+        logging.info( ' y_pred = ' + str(y_pred))
 
         # Compute RMSE.
         y_test = df_csv_slice['outcome_total_delivery_time']
