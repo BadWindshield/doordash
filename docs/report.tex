@@ -1,0 +1,97 @@
+\documentclass[12pt]{article}
+\usepackage{amssymb, amsmath}
+\usepackage{bm}
+\usepackage{dsfont}
+\usepackage{empheq}
+\usepackage{graphicx}
+\usepackage{float}
+
+% Set up the margins.
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+\begin{document}
+
+
+
+\title{DoorDash Data Science Take-Home-Assignment Report}
+
+\author{William Wong}
+\date{March 25, 2018}
+
+\maketitle
+
+
+
+
+
+
+
+
+
+\section{Part I. Model Building}
+
+
+\subsection{Exploratory Analysis}
+
+
+\subsection{Create Additional Features}
+
+
+\subsection{Summary of Features used in the Model}
+% categorical
+% continuous
+The categorical features are:
+\begin{itemize}
+  \item \texttt{created\_at\_hour}
+  \item \texttt{created\_at\_dayofweek}
+  \item \texttt{market\_id}
+  \item \texttt{order\_protocol}
+\end{itemize}
+
+
+The continuous features are:
+\begin{itemize}
+  \item \texttt{total\_items}
+  \item \texttt{subtotal}
+  \item \texttt{num\_distinct\_items}
+  \item \texttt{min\_item\_price}
+  \item \texttt{max\_item\_price}
+  \item \texttt{total\_onshift\_dashers}
+  \item \texttt{total\_busy\_dashers}
+  \item \texttt{fractional\_busy\_dashers}
+  \item \texttt{total\_outstanding\_orders}
+  \item \texttt{estimated\_order\_place\_duration}
+  \item \texttt{estimated\_store\_to\_consumer\_driving\_duration}
+\end{itemize}
+
+
+\subsection{Removing Outliers}
+% Include the outcome variables
+
+\subsection{Imputating Missing Values}
+
+
+\subsection{Training and Testing the Model}
+% mention rf
+
+% 2 plots of results
+
+% RMSE = xx
+
+
+
+
+\section{Part II. The Production Run}
+
+\subsection{The Code Base}
+% unit testing
+% $ python xx.py
+
+% logging
+
+
+\subsection{Cleaning of Model Features}
+
+
+\end{document}
+
