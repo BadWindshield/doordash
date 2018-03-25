@@ -21,13 +21,6 @@
 \maketitle
 
 
-
-
-
-
-
-
-
 \section{Part I. Model Building}
 
 The work was done in a Jupyter notebook called \texttt{explore\_and\_build\_model.ipynb},
@@ -164,6 +157,10 @@ We remember these operations and will repeat them during the production run.
 To get the best performance, we model the outcome variable using random-forest regression with 200 trees.
 We plot the observed outcome variable versus the predicted outcome variable, and the residual versus the predicted outcome variable in Fig.~\ref{fig:results01}.  The root-mean-squared error (RMSE) is found to be $900~\text{seconds} \pm 5\%$, which is decent (about 15 minutes).
 
+We split the dataset randomly into training (90\%) and test (10\%). We train the model using the training set and evaluate the model in terms of RMSE using the test set.
+
+The trained model is serialized to a file using Pickle.
+
 
 % 2 plots of results
 \begin{figure}[H]
@@ -181,16 +178,48 @@ We plot the observed outcome variable versus the predicted outcome variable, and
 \section{Part II. The Production Run}
 
 \subsection{The Code Base}
+We deserialize the model we trained in Part I in Python and apply it to the held-out data.
+
+The highlights in our production-quality code in Python are
+\begin{itemize}
+  \item object-oriented programming (using classes and member functions).
+
+  \item Python logging
 % unit testing
 % $ python xx.py
 
 % logging
 
+  \item unit testing using the \texttt{unittest} framework.
+
+  To run a unit test,
+  \begin{verbatim}
+    $ python test_model.py 
+    .
+    ----------------------------------------------------------------------
+    Ran 1 test in 24.288s
+
+    OK
+  \end{verbatim}
+\end{itemize}
+  In this unit test, we apply a previously trained model on \textit{training data} to compute the RMSE. We ensure that the RMSE stays below some threshold value.
 
 \subsection{Cleaning of Model Features}
 
+Since we remember the previous data-cleaning operations, we will apply them to the features during the production run.
+
+      \begin{verbatim}
+    for col in self.cols_features:
+        logger.info( 'Working on column ' + str(col) )
+        column = self.features_dict[col]
+        df_csv.loc[ df_csv[col] < column.value_low, col]  = column.value_default
+        df_csv.loc[ df_csv[col] > column.value_high, col] = column.value_default
+      \end{verbatim}
 
 \subsection{Prediction of the Holdout Data Set}
+
+
+\section{Discussions}
 
 
 \end{document}
