@@ -31,6 +31,23 @@ class Model(object):
                                'estimated_order_place_duration' : Feature(0, 447.0, 251.0),
                                'estimated_store_to_consumer_driving_duration' : Feature(109.0, 1051.0, 544.0) }
 
+        self.cols_categorical = ['created_at_hour',
+                                 'created_at_dayofweek',
+                                 'market_id',
+                                 'order_protocol']
+
+        self.cols_cont = [ 'total_items',
+                           'subtotal',
+                           'num_distinct_items',
+                           'min_item_price',
+                           'max_item_price',
+                           'total_onshift_dashers',
+                           'total_busy_dashers',
+                           'total_outstanding_orders',
+                           'estimated_order_place_duration',
+                           'estimated_store_to_consumer_driving_duration']
+
+        self.cols_features = self.cols_categorical + self.cols_cont
 
         self.model = None
 
@@ -58,14 +75,53 @@ class Model(object):
         logger = logging.getLogger('Model._fill_nulls()')
 
 
-    def precict(self, X):
+    def predict(self, df_features):
         """
         Given a row of features, generate a prediction from the model.
         """
-        logger = logging.getLogger('Model.precict()')
+        logger = logging.getLogger('Model.predict()')
+
+        df_featuers_in = df_features.copy()
+
+        try:
+            # Might not exist.
+            df_featuers_in['created_at_hour'] = df_featuers_in['created_at'].dt.hour
+        except Exception as e:
+            logger.exception( 'Caught exception ' + str(e) )
+
+        try:
+            # Might not exist
+            df_featuers_in['created_at_dayofweek'] = df_featuers_in['created_at'].dt.dayofweek
+        except Exception as e:
+            logger.exception( 'Caught exception ' + str(e) )
 
         # Clean the features.
         self._remove_outliers()
         self._fill_nulls()
 
+
+def main():
+    # Configure logging.
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(process)d/%(threadName)s - %(name)s - %(levelname)s - %(message)s',
+                        #stream=sys.stdout)
+                        filename='./model.log',
+                        filemode='w')
+    logger = logging.getLogger('main()')
+
+    pd.set_option('display.max_columns', None)
+
+    model = Model()
+    # model.load_model('../notebook/rf.1521943419.pkl')
+
+    # Load input data.
+    str_file_csv = 'historical_data.csv'
+    df_csv = pd.read_csv('../../../data/input/' + str_file_csv,
+                         parse_dates=['created_at',
+                                      'actual_delivery_time'])
+    logging.info( 'df_csv.head() =\n' + str(df_csv.head()) )
+
+
+if __name__ == "__main__":
+    main()
 
