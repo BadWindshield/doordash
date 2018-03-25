@@ -37,6 +37,57 @@ which is submitted for evaluation.
 
 
 \subsection{Creating Additional Features}
+We create three additional features:
+\begin{enumerate}
+  \item \texttt{created\_at\_hour} We extract the hour where the order is created.  This is a categorical variable.
+
+  One can see that most orders are placed late at night (from midnight to 4 AM) and during dinner time (from 7 PM to 9 PM).
+    \begin{verbatim}
+    > df_csv['created_at'].dt.hour.value_counts().sort_index()
+
+    0     12669
+    1     28190
+    2     36976
+    3     27068
+    4     15250
+    5      7096
+    6      1416
+    7        11
+    8         2
+    14       40
+    15      538
+    16     2109
+    17     3413
+    18     5100
+    19    13541
+    20    15560
+    21    11465
+    22     8821
+    23     8163
+    Name: created_at, dtype: int64
+    \end{verbatim}
+
+  \item \texttt{created\_at\_dayofweek} We extract the hour where the day of the week is created.  This is a categorical variable.
+
+  \item \texttt{fractional\_busy\_dashers} We define this continuous variable to be \texttt{total\_busy\_dashers} divided by \texttt{total\_onshift\_dashers}. This variable should provide some insight as to how ``loaded'' the system is.
+
+  One can see that the system is quite busy, as the median value of \texttt{fractional\_busy\_dashers} is 0.95.
+
+    \begin{verbatim}
+    > df_csv['created_at'].dt.dayofweek.value_counts().sort_index()
+
+    count    197421.000000
+    mean          0.954620
+    std           0.416678
+    min           0.000000
+    25%           0.846847
+    50%           0.946429
+    75%           1.000000
+    max          34.000000
+    Name: fractional_busy_dashers, dtype: float64
+    \end{verbatim}
+
+\end{enumerate}
 
 
 \subsection{Summary of Features used in the Model}
@@ -74,6 +125,9 @@ We remove the outliers in the features and in the outcome variable and replace t
 
 
 \begin{verbatim}
+    > df_csv[col_outcome].describe(percentiles=
+                                   [0.01, 0.1, 0.25, 0.5, 0.75, 0.90, 0.95, 0.99])
+
     count    1.974210e+05
     mean     2.908257e+03
     std      1.922961e+04
