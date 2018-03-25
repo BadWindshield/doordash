@@ -4,6 +4,7 @@ import logging
 import math
 import numpy as np
 import pandas as pd
+from sklearn.metrics import mean_squared_error
 import sys
 
 
@@ -61,18 +62,32 @@ class Model(object):
         self.model = pickle.load( open( pickle_file_name, 'rb') )
 
 
-    def _remove_outliers(self, df_in):
+    def _remove_outliers(self, df_csv):
         """
         Remove outliers in the featuers.
         """
         logger = logging.getLogger('Model._remove_outliers()')
 
+        for col in self.cols_features:
+            logger.info( 'Working on column ' + str(col) )
+            column = self.features_dict[col]
+            df_csv.loc[ df_csv[col] < column.value_low, col]  = column.value_default
+            df_csv.loc[ df_csv[col] > column.value_high, col] = column.value_default
 
-    def _fill_nulls(self, df_in):
+
+    def _fill_nulls(self, df_csv):
         """
         Fill NaNs in the features.
+        Use median if the column is continuous.
+        Use mode if the column is categorical.
         """
         logger = logging.getLogger('Model._fill_nulls()')
+
+        for col in self.cols_categorical:
+            df_csv[col].fillna(df_csv[col].mode()[0], inplace=True)
+
+        for col in self.cols_cont:
+            df_csv[col].fillna(df_csv[col].median(), inplace=True)
 
 
     def predict(self, df_features):
@@ -82,7 +97,7 @@ class Model(object):
         logger = logging.getLogger('Model.predict()')
 
         # df_features should be a DataFrame.
-        logging.info( 'type(df_features) = ' + str(type(df_features)) )
+        logger.info( 'type(df_features) = ' + str(type(df_features)) )
 
         df_featuers_in = df_features.copy()
         logger.info( 'df_featuers_in =\n' + str(df_featuers_in) )
@@ -103,7 +118,26 @@ class Model(object):
         self._remove_outliers(df_featuers_in)
         self._fill_nulls(df_featuers_in)
 
-        return 1.0
+        # Handle the extra feature(s).
+        df_featuers_in['fractional_busy_dashers'] = df_featuers_in['total_busy_dashers'] / df_featuers_in['total_onshift_dashers']
+
+        # Handle infinities.
+        df_featuers_in['fractional_busy_dashers'].replace([np.inf, -np.inf], 9.46e-1, inplace=True)
+
+        # Handle NaNs.
+        df_featuers_in['fractional_busy_dashers'].fillna(df_featuers_in['fractional_busy_dashers'].median(), inplace=True)
+        self.cols_cont.append('fractional_busy_dashers')
+        self.cols_features = self.cols_categorical + self.cols_cont
+
+        # Check for NaNs.
+        df_tmp = df_featuers_in.isnull().any()
+        logger.info( 'df_tmp[ df_tmp==True ] = ' + str(df_tmp[ df_tmp==True ]) )
+
+        # Apply the model.
+        X_test = df_featuers_in[self.cols_features]
+        y_pred = self.model.predict(X_test)
+
+        return y_pred
 
 
 def main():
@@ -118,7 +152,7 @@ def main():
     pd.set_option('display.max_columns', None)
 
     model = Model()
-    # model.load_model('../notebook/rf.1521943419.pkl')
+    model.load_model('../notebooks/rf_simple.1521943419.pkl')
 
     # Load input data.
     str_file_csv = 'historical_data.csv'
@@ -132,11 +166,14 @@ def main():
     logging.info( 'df_csv.head() =\n' + str(df_csv.head()) )
 
     # Make a few predictions.
-    y_pred = model.predict( df_csv.iloc[0:1] )
+    df_csv_slice = df_csv.iloc[0:5]
+    y_pred = model.predict( df_csv_slice )
     logging.info( ' ypred = ' + str(y_pred))
 
     # Compute RMSE.
-
+    y_test = df_csv_slice['outcome_total_delivery_time']
+    RMSE = np.sqrt( mean_squared_error(y_test, y_pred) )
+    logger.info( 'RMSE = ' + str(RMSE) )
 
 
 if __name__ == "__main__":
