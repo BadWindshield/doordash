@@ -61,14 +61,14 @@ class Model(object):
         self.model = pickle.load( open( pickle_file_name, 'rb') )
 
 
-    def _remove_outliers(self):
+    def _remove_outliers(self, df_in):
         """
         Remove outliers in the featuers.
         """
         logger = logging.getLogger('Model._remove_outliers()')
 
 
-    def _fill_nulls(self):
+    def _fill_nulls(self, df_in):
         """
         Fill NaNs in the features.
         """
@@ -77,11 +77,15 @@ class Model(object):
 
     def predict(self, df_features):
         """
-        Given a row of features, generate a prediction from the model.
+        Given one or more rows of features, generate a prediction from the model.
         """
         logger = logging.getLogger('Model.predict()')
 
+        # df_features should be a DataFrame.
+        logging.info( 'type(df_features) = ' + str(type(df_features)) )
+
         df_featuers_in = df_features.copy()
+        logger.info( 'df_featuers_in =\n' + str(df_featuers_in) )
 
         try:
             # Might not exist.
@@ -96,8 +100,10 @@ class Model(object):
             logger.exception( 'Caught exception ' + str(e) )
 
         # Clean the features.
-        self._remove_outliers()
-        self._fill_nulls()
+        self._remove_outliers(df_featuers_in)
+        self._fill_nulls(df_featuers_in)
+
+        return 1.0
 
 
 def main():
@@ -119,7 +125,18 @@ def main():
     df_csv = pd.read_csv('../../../data/input/' + str_file_csv,
                          parse_dates=['created_at',
                                       'actual_delivery_time'])
+
+    # Try to calculate the outcome variable.
+    col_outcome = 'outcome_total_delivery_time'
+    df_csv[col_outcome] = ( df_csv['actual_delivery_time'] - df_csv['created_at'] ) / np.timedelta64(1, 's')
     logging.info( 'df_csv.head() =\n' + str(df_csv.head()) )
+
+    # Make a few predictions.
+    y_pred = model.predict( df_csv.iloc[0:1] )
+    logging.info( ' ypred = ' + str(y_pred))
+
+    # Compute RMSE.
+
 
 
 if __name__ == "__main__":
